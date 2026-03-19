@@ -20,15 +20,15 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Install project dependencies
+      # Install dependencies (runtime + dev)
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
 
       # Run unit tests
       - name: Run tests
-        run: |
-          pytest
+        run: pytest
 
       # Authenticate to Docker Hub
       - name: Login Docker Hub
