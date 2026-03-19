@@ -3,41 +3,69 @@ name: CI
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
-  workflow_dispatch:
 
 jobs:
   build:
-    environment: fastapi
     runs-on: ubuntu-latest
-
-    env:
-      IMAGE_NAME: dani54196/fastapi-hello
+    environment: fastapi
 
     steps:
-      - name: Checkout repo
+      # Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Login a Docker Hub
-      - name: Login to Docker Hub
+      # Set up Python runtime
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Install project dependencies
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Run unit tests
+      - name: Run tests
+        run: |
+          pytest
+
+      # Authenticate to Docker Hub
+      - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build de la imagen
-      - name: Build Docker image
-        run: |
-          docker build -t $IMAGE_NAME:${{ github.sha }} .
+      # Generate short commit SHA tag
+      - name: Set tag
+        id: tag
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      # Tag latest
-      - name: Tag latest
+      # Build Docker image
+      - name: Build image
         run: |
-          docker tag $IMAGE_NAME:${{ github.sha }} $IMAGE_NAME:latest
+          docker build -t dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} .
+          docker tag dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} dani54196/fastapi-hello:latest
 
-      # Push de las imágenes
-      - name: Push Docker images
+      # Run Trivy filesystem scan (source code)
+      - name: Run Trivy (fs scan)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: fs
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      # Run Trivy image scan (Docker image)
+      - name: Run Trivy (image scan)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
+      # Push image only if all previous steps succeed
+      - name: Push image
         run: |
-          docker push $IMAGE_NAME:${{ github.sha }}
-          docker push $IMAGE_NAME:latest
+          docker push dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }}
+          docker push dani54196/fastapi-hello:latest
