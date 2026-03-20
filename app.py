@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from datetime import datetime
 
 app = FastAPI()
-
 
 @app.get("/")
 async def root():
@@ -9,4 +9,8 @@ async def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "message": "Serice is running",
+        "date": datetime.now().isoformat()
+        }
