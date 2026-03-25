@@ -18,7 +18,9 @@ FROM base AS dev
 RUN pip install --no-cache-dir uvicorn[standard]
 
 # No code copy → will use volume
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000"]
+
 
 # ---------- TEST ----------
 FROM base AS test

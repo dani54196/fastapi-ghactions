@@ -1,0 +1,25 @@
+name: tests
+
+on:
+  push:
+    branches: ["Develop"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: test
+    
+    steps:
+      # Checkout repo
+      - name: test
+        uses: actions/checkout@v4
+
+      # Set up Python runtime
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Hello test!
+      - name: Hello!
+        run: echo"Hello test!"
