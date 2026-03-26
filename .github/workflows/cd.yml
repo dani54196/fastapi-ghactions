@@ -1,0 +1,29 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull latest image
+        run: sudo docker pull dani54196/fastapi-hello:latest
+
+      - name: Stop container
+        run: sudo docker stop fastapi-app || true
+
+      - name: Remove container
+        run: sudo docker rm fastapi-app || true
+
+      - name: Run new container
+        run: |
+          sudo docker run -d \
+            --name fastapi-app \
+            -p 80:8000 \
+            --restart always \
+            dani54196/fastapi-hello:latest
