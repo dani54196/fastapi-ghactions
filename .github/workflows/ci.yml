@@ -43,10 +43,20 @@ jobs:
         run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       # Build Docker image
-      - name: Build image
+      # - name: Build image
+      #   run: |
+      #     docker build -t dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} .
+      #     docker tag dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} dani54196/fastapi-hello:latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push multi-arch
         run: |
-          docker build -t dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} .
-          docker tag dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} dani54196/fastapi-hello:latest
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }} \
+            -t dani54196/fastapi-hello:latest \
+            --push .
 
       # Run Trivy filesystem scan (source code)
       - name: Run Trivy (fs scan)
