@@ -60,7 +60,7 @@ jobs:
 
       # Run Trivy filesystem scan (source code)
       - name: Run Trivy (fs scan)
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: fs
           ignore-unfixed: true
@@ -68,7 +68,7 @@ jobs:
 
       # Run Trivy image scan (Docker image)
       - name: Run Trivy (image scan)
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }}
           severity: CRITICAL,HIGH
