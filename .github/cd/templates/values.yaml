@@ -1,0 +1,10 @@
+image:
+  repository: dani54196/fastapi-hello
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+
+containerPort: 8000
