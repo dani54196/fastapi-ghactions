@@ -7,10 +7,14 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/ping")
+async def ping():
+    return {"message": "Pong"}
+
 @app.get("/health")
 def health_check():
     return {
             "status": "ok",
-            "message": "Serice is running",
+            "message": "Service is running",
             "date": datetime.now().isoformat()
         }
