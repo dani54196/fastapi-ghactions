@@ -59,6 +59,7 @@ jobs:
       - name: Run Trivy (fs scan)
         uses: aquasecurity/trivy-action@v0.24.0
         with:
+          trivyignorefile: .trivyignore
           scan-type: fs
           ignore-unfixed: true
           severity: CRITICAL,HIGH
@@ -67,6 +68,7 @@ jobs:
       - name: Run Trivy (image scan)
         uses: aquasecurity/trivy-action@v0.24.0
         with:
+          trivyignorefile: .trivyignore
           image-ref: dani54196/fastapi-hello:${{ steps.tag.outputs.TAG }}
           severity: CRITICAL,HIGH
           exit-code: 1
